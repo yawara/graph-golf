@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import networkx as nx
 from opt import diam_aspl
 
@@ -12,3 +14,7 @@ def opt(G,n):
       H, diam, aspl = tmp, tmp_diam, tmp_aspl
       print(cnt_swapped)
       print(diam,aspl)
+
+if __name__ == "__main__":
+  G=nx.random_regular_graph(3,64)
+  opt(G,2)
