@@ -48,14 +48,6 @@ def nd2(p, k):
     G.remove_node(second_layer[0])
     G.remove_node(second_layer[1])
 
-    for node in G.nodes():
-        if G.degree()[node] == q - 1:
-            for node2 in G.nodes():
-                if G.degree()[node2] == q - 1:
-                    if nx.shortest_path_length(G)[node][node2] == 3:
-                        G.add_edge(node, node2)
-                        break
-
     return G
 
 
@@ -69,17 +61,53 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('p', type=int)
     parser.add_argument('k', type=int)
+    parser.add_argument('--verbose', action='store_true')
     args = parser.parse_args()
 
     G = nd2(args.p, args.k)
-    print(len(G), set(G.degree().values()), nx.diameter(G), nx.average_shortest_path_length(G))
+    q = args.p ** args.k
 
     G = nx.relabel.convert_node_labels_to_integers(G)
+
     if not os.path.exists('results'):
         os.mkdir('results')
+
+    if args.verbose:
+        N1, ds1, D1, aspl1 = len(G), set(G.degree().values()), nx.diameter(
+            G), nx.average_shortest_path_length(G)
+        print N1, ds1, D1, aspl1
+
+    filename = os.path.join('results', 'n' + str(len(G)) + 'd' +
+                            str(max(G.degree().values())) + 'or' + str(min(G.degree().values())) + '_edgelist.txt')
+    nx.write_edgelist(G, filename)
+
+    if args.verbose:
+        G = nx.read_edgelist(filename)
+        N2, ds2, D2, aspl2 = len(G), set(G.degree().values()), nx.diameter(
+            G), nx.average_shortest_path_length(G)
+        assert (N1, ds1, D1, aspl1) == (N2, ds2, D2, aspl2)
+        print N2, ds2, D2, aspl2
+
+    for node in G.nodes():
+        if G.degree()[node] == q - 1:
+            for node2 in G.nodes():
+                if G.degree()[node2] == q - 1:
+                    if nx.shortest_path_length(G)[node][node2] == 3:
+                        G.add_edge(node, node2)
+                        break
+
+    if args.verbose:
+        N1, ds1, D1, aspl1 = len(G), set(G.degree().values()), nx.diameter(
+            G), nx.average_shortest_path_length(G)
+        print N1, ds1, D1, aspl1
+
     filename = os.path.join('results', 'n' + str(len(G)) + 'd' +
                             str(max(G.degree().values())) + '_edgelist.txt')
     nx.write_edgelist(G, filename)
 
-    G = nx.read_edgelist(filename)
-    print(len(G), set(G.degree().values()), nx.diameter(G), nx.average_shortest_path_length(G))
+    if args.verbose:
+        G = nx.read_edgelist(filename)
+        N2, ds2, D2, aspl2 = len(G), set(G.degree().values()), nx.diameter(
+            G), nx.average_shortest_path_length(G)
+        assert (N1, ds1, D1, aspl1) == (N2, ds2, D2, aspl2)
+        print N2, ds2, D2, aspl2
