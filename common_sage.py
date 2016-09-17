@@ -38,3 +38,9 @@ def gbc(R):
                     G.add_edge(l1, l2)
 
     return G
+
+if __name__ == '__main__':
+    G = gbc(GF(7))
+    G = nx.relabel.convert_node_labels_to_integers(G)
+    print len(G), set(G.degree().values()), nx.diameter(G), nx.average_shortest_path_length(G)
+    nx.write_edgelist(G, os.path.join('results', 'n57d8or7_edgelist.txt'))

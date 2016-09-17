@@ -1,3 +1,5 @@
+#!/usr/bin/env sage
+
 from sage.all import *
 
 from itertools import product
@@ -6,6 +8,7 @@ import pickle
 
 import networkx as nx
 
+from common import nx_to_ig
 from common_sage import gbc
 
 
@@ -73,8 +76,9 @@ if __name__ == '__main__':
         os.mkdir('results')
 
     if args.verbose:
-        N1, ds1, D1, aspl1 = len(G), set(G.degree().values()), nx.diameter(
-            G), nx.average_shortest_path_length(G)
+        ig_G = nx_to_ig(G)
+        N1, ds1, D1, aspl1 = len(G), set(
+            G.degree().values()), ig_G.diameter(), ig_G.average_path_length()
         print N1, ds1, D1, aspl1
 
     filename = os.path.join('results', 'n' + str(len(G)) + 'd' +
@@ -82,9 +86,10 @@ if __name__ == '__main__':
     nx.write_edgelist(G, filename)
 
     if args.verbose:
-        G = nx.read_edgelist(filename)
-        N2, ds2, D2, aspl2 = len(G), set(G.degree().values()), nx.diameter(
-            G), nx.average_shortest_path_length(G)
+        G = nx.relabel.convert_node_labels_to_integers(nx.read_edgelist(filename))
+        ig_G = nx_to_ig(G)
+        N2, ds2, D2, aspl2 = len(G), set(
+            G.degree().values()), ig_G.diameter(), ig_G.average_path_length()
         assert (N1, ds1, D1, aspl1) == (N2, ds2, D2, aspl2)
         print N2, ds2, D2, aspl2
 
@@ -92,13 +97,14 @@ if __name__ == '__main__':
         if G.degree()[node] == q - 1:
             for node2 in G.nodes():
                 if G.degree()[node2] == q - 1:
-                    if nx.shortest_path_length(G)[node][node2] == 3:
+                    if nx_to_ig(G).shortest_paths()[node][node2] == 3:
                         G.add_edge(node, node2)
                         break
 
     if args.verbose:
-        N1, ds1, D1, aspl1 = len(G), set(G.degree().values()), nx.diameter(
-            G), nx.average_shortest_path_length(G)
+        ig_G = nx_to_ig(G)
+        N1, ds1, D1, aspl1 = len(G), set(
+            G.degree().values()), ig_G.diameter(), ig_G.average_path_length()
         print N1, ds1, D1, aspl1
 
     filename = os.path.join('results', 'n' + str(len(G)) + 'd' +
@@ -107,7 +113,8 @@ if __name__ == '__main__':
 
     if args.verbose:
         G = nx.read_edgelist(filename)
-        N2, ds2, D2, aspl2 = len(G), set(G.degree().values()), nx.diameter(
-            G), nx.average_shortest_path_length(G)
+        ig_G = nx_to_ig(G)
+        N2, ds2, D2, aspl2 = len(G), set(
+            G.degree().values()), ig_G.diameter(), ig_G.average_path_length()
         assert (N1, ds1, D1, aspl1) == (N2, ds2, D2, aspl2)
         print N2, ds2, D2, aspl2
