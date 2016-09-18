@@ -95,7 +95,13 @@ if __name__ == '__main__':
         G.degree().values()), ig_G.diameter(), ig_G.average_path_length()
     print N, ds, D, aspl
 
-    print "original aspl:", predicted_aspl_after_adding_edges(float(q))
+    H = nx.read_edgelist(os.path.join('results', 'n' + str(len(G)) + 'd' +
+                                      str(max(G.degree().values())) + '_edgelist.txt'))
+    original_aspl = nx_to_ig(H).average_path_length()
+    predicted_original_aspl = predicted_aspl_after_adding_edges(float(q))
+    print "original aspl:", original_aspl
+    print "predicted original aspl:", predicted_original_aspl
+    assert original_aspl == predicted_original_aspl
     print "revised aspl:", aspl
     assert aspl < predicted_aspl_after_adding_edges(float(q))
 
