@@ -13,32 +13,36 @@ from common_sage import gbc
 
 
 def nd2(p, k):
-    assert is_prime(p)
+    assert is_prime(p) and p > 2
     assert k >= 1
 
     q = p**k
     G = gbc(GF(q))
 
+    # REMARK: missing frist layer
+    second_layer = []
     for node in G.nodes():
         if G.degree()[node] == q:
-            G.remove_nodes_from(G.neighbors(node))
-            G.remove_node(node)
-            break
-
-    return G
-
-
-def nd2_plus(p, k):
-    assert is_prime(p)
-    assert k >= 1
-
-    q = p**k
-    G = gbc(GF(q))
-
+            second_layer.append(node)
+    third_layer = []
     for node in G.nodes():
-        if G.degree()[node] == q:
-            G.remove_node(node)
-            break
+        if G.degree()[node] == q + 1:
+            third_layer.append(node)
+    kind_table = {}
+    for node in G.nodes():
+        if node in second_layer:
+            kind_table[node] = 'second'
+        elif node in third_layer:
+            kind_table[node] = 'third'
+        else:
+            raise Exception
+
+    removed_third = []
+    for n in G.neighbors(second_layer[0]):
+        if n in third_layer:
+            removed_third.append(n)
+    G.remove_nodes_from(removed_third)
+    G.remove_node(second_layer[0])
 
     return G
 
